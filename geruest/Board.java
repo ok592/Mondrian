@@ -226,7 +226,7 @@ public class Board extends JPanel implements ActionListener {
         int[] x = new int[pointList.size()];
         int[] y = new int[pointList.size()];
         int n = pointList.size();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n-1; i++) {
             x[i] = (int) this.currentPointList.get(i).getX();
             y[i] = (int) this.currentPointList.get(i).getY();
         }

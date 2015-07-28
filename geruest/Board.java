@@ -13,9 +13,16 @@ public class Board extends JPanel implements ActionListener {
     private final int DELAY = 10;
     private Timer timer;
     private Player player;
+    private Enemy enemy;
     private CopyOnWriteArrayList<Point2D> currentPointList = new CopyOnWriteArrayList<>();
     private CopyOnWriteArrayList<Polygon> polyList = new CopyOnWriteArrayList<>();
     private boolean[][] allPoints = new boolean[200][200];
+    public int percentage = 0;
+    private final String[] LOSTMSGS = new String[]{"C´mon man, u can do better!", "Das war suboptimal..", "Spielst du um zu gewinnen, oder um diese Nachricht zu sehen?",
+            "You´re embarrassing yourself!", "That´s not how you play this game", "Your score is 0.", "Vielleicht beim nächsten Mal, aber ich glaube eher nicht", "Dein wievielter " +
+            "Versuch war das jetzt? Ich hab aufgehört mitzuzählen", "You lost. Again.", "Here I stand again, THE LOSER!"};
+    //array of messages. one of those is shown if the game was lost.
+
 
     public Board() {
         initBoard();
@@ -27,6 +34,7 @@ public class Board extends JPanel implements ActionListener {
         setBackground(Color.white);
 
         player = new Player();
+        enemy = new Enemy();
 
         timer = new Timer(DELAY, this);
         timer.start();
@@ -60,6 +68,7 @@ public class Board extends JPanel implements ActionListener {
 
         if (x >= 0 && x < 200 && y >= 0 && y < 200) {
             allPoints[x][y] = true;
+            percentage++;
             currentPointList.add(new Point(x, y));
         }
 
@@ -70,8 +79,11 @@ public class Board extends JPanel implements ActionListener {
         g2d.setColor(Color.blue);
         drawPolys(g2d);
         //checkPolys();
-        g2d.setColor(Color.green);
+        g2d.setColor(Color.blue);
         g2d.fillOval(x, y, player.getWidth(), player.getHeight());
+
+        g2d.setColor(Color.red);
+        g2d.fillOval(enemy.getX(), enemy.getY(), enemy.getWidth(), enemy.getHeight());
 
         //System.out.println(polyList.size());
     }
@@ -207,7 +219,14 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         player.move();
+        enemy.move();
         repaint();
+
+        //checks if >=80% have been filled, and shows a popup.
+        if(didIWinYet()){
+            JOptionPane.showMessageDialog(null, "WINRAR! Your Score is " + String.format("%,d", percentage) + "!", "You Win!", 3);
+            System.exit(0);
+        }
 
     }
 
@@ -245,6 +264,16 @@ public class Board extends JPanel implements ActionListener {
             player.keyPressed(e);
             checkPolys();
         }
+    }
+
+    //calculates the percentage of the filled area. if over 80% of the area are filled, the player wins
+    //the game and a message pops up (see keyPressed() method)
+    private boolean didIWinYet(){
+        return ((percentage*100)/(200*200) >= 80);
+    }
+
+    public boolean isFilled(int x, int y){
+        return allPoints[x][y];
     }
 
 }

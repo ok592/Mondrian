@@ -18,7 +18,7 @@ public class Board extends JPanel implements ActionListener {
     private CopyOnWriteArrayList<Point2D> currentPointList = new CopyOnWriteArrayList<>();
     private ArrayList<Point> borderPointList = new ArrayList<>();
     private ArrayList<Point> whereWasI = new ArrayList<>();
-    private boolean[][] allPoints = new boolean[200][200];
+    private boolean[][] allPoints = new boolean[205][205];
     private int percentage = 0;
     private int offset;
     private int enemyOffset;
@@ -122,18 +122,20 @@ public class Board extends JPanel implements ActionListener {
         if (x >= 0 && x < 200 && y >= 0 && y < 200) {
             //allPoints[x][y] = true;
             currentPointList.add(new Point(x, y));
-            whereWasI.add(new Point(x,y));
+            if(!allPoints[x][y]) {
+                whereWasI.add(new Point(x, y));
+            }
         }
 
         g2d.setStroke(new BasicStroke(2));
-
-        g2d.setColor(Color.black);
-        drawLine(g2d);
 
         //COLORS[(int) (Math.random() * COLORS.length)]
         g2d.setColor(Color.yellow);
         //polys.drawPolys(g2d);
         drawPoints(g2d);
+
+        g2d.setColor(Color.black);
+        drawLine(g2d);
 
         g2d.setColor(Color.blue);
         g2d.fillOval(x, y, player.getWidth(), player.getHeight());
@@ -149,7 +151,6 @@ public class Board extends JPanel implements ActionListener {
             for (int j = 0; j < allPoints[i].length; j++) {
                 if (allPoints[i][j]) {
                     g2d.drawLine(i, j, i, j);
-                    g2d.drawLine(i+offset, j+offset, i+offset, j+offset);
                 }
             }
         }
@@ -170,6 +171,11 @@ public class Board extends JPanel implements ActionListener {
                 for (int j = 0; j < booleans[i].length; j++) {
                     if (booleans[i][j]) {
                         allPoints[i][j] = true;
+                        for(int a = i; a<=i+offset; a++){
+                            for(int b = j; b <=j+offset; b++){
+                                allPoints[a][b]=true;
+                            }
+                        }
                     }
                 }
             }
@@ -212,16 +218,16 @@ public class Board extends JPanel implements ActionListener {
 
         //checks for the whole size of the player and the enemy in x and y coordinates. if there is a hit in x AND
         //y coordinates, the player has touched the enemy and thus lost the game.
-        for(int i = player.getX(); i<=player.getX()+player.getHeight(); i++){
-            for(int j = enemy.getX(); j<=enemy.getX()+enemy.getHeight(); j++){
+        for(int i = player.getX()+2; i<=player.getX()+player.getHeight()-2; i++){
+            for(int j = enemy.getX()+2; j<=enemy.getX()+enemy.getHeight()-2; j++){
                 if(i==j) {
                     xHit = true;
                     break;
                 }
             }
         }
-        for(int i = player.getY(); i<=player.getY()+player.getHeight(); i++){
-            for(int j = enemy.getY(); j<=enemy.getY()+enemy.getHeight(); j++) {
+        for(int i = player.getY()+2; i<=player.getY()+player.getHeight()-2; i++){
+            for(int j = enemy.getY()+2; j<=enemy.getY()+enemy.getHeight()-2; j++) {
                 if (i == j) {
                     yHit = true;
                     break;
@@ -232,7 +238,7 @@ public class Board extends JPanel implements ActionListener {
         //checks every point in the line currently being drawn with the position of the enemy.
         //if both exist, the enemy has touched a line currently being drawn which means the player has lost the game.
         for(Point2D p : currentPointList){
-            for(int k = enemy.getX(); k<=enemy.getX()+enemy.getHeight(); k++){
+            for(int k = enemy.getX()+2; k<=enemy.getX()+enemy.getHeight()-2; k++){
                 if(p.getX()==k) {
                     lineX = (int)p.getX();
                     break;
@@ -241,7 +247,7 @@ public class Board extends JPanel implements ActionListener {
         }
 
         for(Point2D p : currentPointList){
-            for(int l = enemy.getY(); l<=enemy.getY()+enemy.getHeight(); l++){
+            for(int l = enemy.getY()+2; l<=enemy.getY()+enemy.getHeight()-2; l++){
                 if(p.getY()==l) {
                     lineY = (int)p.getY();
                     break;
@@ -254,7 +260,7 @@ public class Board extends JPanel implements ActionListener {
         Point hitpoint = new Point(lineX, lineY);
 
         //and the deque must contain this point.
-        lineHit = currentPointList.contains(hitpoint) && !borderPointList.contains(hitpoint);
+        lineHit = currentPointList.contains(hitpoint) && !borderPointList.contains(hitpoint) && !whereWasI.contains(hitpoint);
 
         return ((xHit&&yHit) || lineHit) && !allPoints[a][b];
     }

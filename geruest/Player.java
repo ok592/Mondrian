@@ -38,8 +38,18 @@ public class Player {
     }
 
     public void move() {
-        x += xChange;
-        y += yChange;
+        if(x>-5 && x<=200) {
+            x += xChange;
+        }
+        else{
+            x = x < 0 ? -4 : 198;
+        }
+        if(y>-5 && y<=200) {
+            y += yChange;
+        }
+        else {
+            y = y <0 ?-4 : 198;
+        }
     }
 
     public void keyPressed(KeyEvent e) {

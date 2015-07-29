@@ -259,10 +259,10 @@ public class Board extends JPanel implements ActionListener {
         //the enemy has actually touched the line. those x and y variables must come from the same point.
         Point hitpoint = new Point(lineX, lineY);
 
-        //and the deque must contain this point.
-        lineHit = currentPointList.contains(hitpoint) && !borderPointList.contains(hitpoint) && !whereWasI.contains(hitpoint);
+        //and the deque must contain this point. && !whereWasI.contains(hitpoint)
+        lineHit = currentPointList.contains(hitpoint) && !borderPointList.contains(new Point(hitpoint.x-offset, hitpoint.y-offset));
 
-        return ((xHit&&yHit) || lineHit) && !allPoints[a][b];
+        return ((xHit&&yHit) || lineHit) && !allPoints[a+offset][b+offset];
     }
 
 
